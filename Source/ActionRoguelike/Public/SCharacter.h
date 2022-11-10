@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SAction.h"
+#include "SActionComponent.h"
 #include "SAttributeComponent.h"
 #include "SInteractionComponent.h"
 #include "GameFramework/Character.h"
@@ -14,41 +16,14 @@ class ACTIONROGUELIKE_API ASCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-protected:
-	FTimerHandle TimerHandle_PrimaryAttack;
-	FTimerHandle TimerHandle_BlackHoleAttack;
-	FTimerHandle TimerHandle_DashAttack;
-
-	UPROPERTY(VisibleAnywhere, Category = "Effects")
-	FName TimeToHitParamName;
-
-	UPROPERTY(VisibleAnywhere, Category = "Effects")
-	FName HandSocketName;
-	
-	UPROPERTY(EditAnywhere,Category="Attack")
-	TSubclassOf<AActor> ProjectileClass;
-
-	// UPROPERTY(EditAnywhere,Category="Attack")
-	// TSubclassOf<AActor> PressE_ProjectileClass;
-	UPROPERTY(EditAnywhere,Category="Attack")
-	TSubclassOf<AActor> BlackHoleProjectileClass;
-
-	UPROPERTY(EditAnywhere,Category="Attack")
-	TSubclassOf<AActor> DashAttackProjectileClass;
-	
-	UPROPERTY(EditAnywhere,Category="Attack")
-	UAnimMontage* AttackAnim;
-
-	UPROPERTY(EditAnywhere,Category="Attack")
-	float AttackAnimDelay;
-
-	
 public:
 	// Sets default values for this character's properties
 	ASCharacter();
 
 protected:
-
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeToHitParamName;
+	
 	/* Particle System played during attack animation */
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UParticleSystem* CastingEffect;
@@ -65,8 +40,9 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
 	USAttributeComponent* AttributeComp;
 
-	void StartAttackEffects();
-
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Actions")
+	USActionComponent* ActionComp;
+	
 	void MoveForward(float value);
 
 	UFUNCTION()
@@ -75,18 +51,22 @@ protected:
 	virtual void PostInitializeComponents() override;
 public:	
 	// Called every frame
+	
 	virtual void Tick(float DeltaTime) override;
 
 	void MoveRight(float value);
-	void PrimaryAttack_TimeElapsed();
 	void PrimaryAttack();
 	void PrimaryInteract();
-	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
-	void BlackHoleAttack_TimeElapsed();
 	void BlackHoleAttack();
-	void DashAttack_TimeElapsed();
 	void DashAttack();
+
+	void SprintStart();
+	void SpringStop();
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual FVector GetPawnViewLocation() const override;
+	
+	UFUNCTION(Exec)//will auto work in character,pawn,gamemode,cheat manager.
+	void HealSelf(float Amount);
 };

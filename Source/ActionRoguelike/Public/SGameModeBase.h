@@ -34,9 +34,15 @@ protected:
 	void OnQuerryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 	UFUNCTION()
 	void SpawnBotTimerElapsed();
+
+	UFUNCTION()
+	void RespawnPlayerElapsed(AController* Controller);
 public:
 	ASGameModeBase();
 
-
+	virtual void OnActorKilled(AActor* VictimActor,AActor* Killer);
+	
 	virtual void StartPlay() override;
+	UFUNCTION(Exec)
+	void KillAll();
 };

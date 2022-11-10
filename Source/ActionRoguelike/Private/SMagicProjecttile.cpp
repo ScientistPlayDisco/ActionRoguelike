@@ -4,6 +4,7 @@
 #include "SMagicProjecttile.h"
 
 #include "SAttributeComponent.h"
+#include "SGameplayFunctionLibrary.h"
 #include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -15,11 +16,21 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* PrimitiveComponent, 
 {
 	if(Actor&& Actor !=GetInstigator())
 	{
-		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(Actor->GetComponentByClass(USAttributeComponent::StaticClass()));
-		if(AttributeComp)
+		// USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(Actor->GetComponentByClass(USAttributeComponent::StaticClass()));
+		// if(AttributeComp)
+		// {
+		// 	AttributeComp->ApplyHealthChange(GetInstigator(),-DamageAmount);
+		// 	Explode();
+		// }
+		USActionComponent* ActionComp = Cast<USActionComponent>(Actor->GetComponentByClass(USActionComponent::StaticClass()));
+		if (USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(),Actor,DamageAmount,HitResult))
 		{
-			AttributeComp->ApplyHealthChange(GetInstigator(),-DamageAmount);
 			Explode();
+
+			if(ActionComp)
+			{
+				ActionComp->AddAction(GetInstigator(),BurningActionClass);
+			}
 		}
 	}
 }

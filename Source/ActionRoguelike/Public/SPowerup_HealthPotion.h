@@ -23,6 +23,9 @@ protected:
 	public:
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 
+	UPROPERTY(EditAnywhere,Category="Credits")
+	int32 CreditCost;
+	
 	ASPowerup_HealthPotion();
 	
 };

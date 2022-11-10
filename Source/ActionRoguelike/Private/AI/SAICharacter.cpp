@@ -11,6 +11,8 @@
 #include "SWorldUserWidget.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ASAICharacter::ASAICharacter()
@@ -18,6 +20,11 @@ ASAICharacter::ASAICharacter()
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnScenceComp");
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	ActionComp = CreateDefaultSubobject<USActionComponent>("ActionComp");
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic,ECR_Ignore);
+	GetMesh()->SetGenerateOverlapEvents(true);
+
+	
 }
 void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth,
 	float Delta)
@@ -54,6 +61,11 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 			//ragdoll
 			GetMesh()->SetAllBodiesSimulatePhysics(true);
 			GetMesh()->SetCollisionProfileName("Ragdoll");
+			//	死亡后碰撞消失  禁用运动
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			GetCharacterMovement()->DisableMovement();
+			
+			
 			SetLifeSpan(10.f);
 			// DrawDebugString(GetWorld(),GetActorLocation(),"hit",nullptr,FColor::White,4.f,true);
 		}
@@ -63,6 +75,14 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 	}
 
 }
+void ASAICharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	PawnSensingComp->OnSeePawn.AddDynamic(this,&ASAICharacter::OnPawnSeen);
+	AttributeComp->OnHealthChanged.AddDynamic(this,&ASAICharacter::OnHealthChanged);
+
+}
+
 
 void ASAICharacter::SetTarget(AActor* NewTarget)
 {
@@ -79,13 +99,5 @@ void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
 	SetTarget(Pawn);
 	DrawDebugString(GetWorld(),GetActorLocation(),"PLAYER SPOTTED",nullptr,FColor::White,4.f,true);
-}
-
-void ASAICharacter::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-	PawnSensingComp->OnSeePawn.AddDynamic(this,&ASAICharacter::OnPawnSeen);
-	AttributeComp->OnHealthChanged.AddDynamic(this,&ASAICharacter::OnHealthChanged);
-
 }
 

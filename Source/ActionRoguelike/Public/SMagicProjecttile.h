@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SActionEffect.h"
 #include "SProjectileBase.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
@@ -15,27 +16,25 @@ class ACTIONROGUELIKE_API ASMagicProjectile : public ASProjectileBase
 	GENERATED_BODY()
 
 public:
-	UFUNCTION()
-	void OnActorOverlap(UPrimitiveComponent* PrimitiveComponent, AActor* Actor,
-	                    UPrimitiveComponent* PrimitiveComponent1,
-	                    int I, bool bArg, const FHitResult& HitResult);
-	// UFUNCTION()
-	// void OnActorOverlap(UPrimitiveComponent* PrimitiveComponent, AActor* Actor, UPrimitiveComponent* PrimitiveComponent1, int I, bool bArg, const FHitResult& HitResult);
-	// UFUNCTION()
-	// void OnCompHit(UPrimitiveComponent* PrimitiveComponent, AActor* Actor, UPrimitiveComponent* PrimitiveComponent1, FVector Vector, const FHitResult& HitResult);
-	// Sets default values for this character's properties
+	
 	ASMagicProjectile();
-
-protected:
-
-
-
-	virtual void BeginPlay() override;
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
+protected:
+
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly,Category="Damage")
 	float DamageAmount;
+	
+	UFUNCTION() 
+	void OnActorOverlap(UPrimitiveComponent* PrimitiveComponent, AActor* Actor,
+						UPrimitiveComponent* PrimitiveComponent1,
+						int I, bool bArg, const FHitResult& HitResult);
+
+	UPROPERTY(EditDefaultsOnly,Category="Damage")
+	TSubclassOf<USActionEffect> BurningActionClass;
+	
+
 };

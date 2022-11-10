@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SActionComponent.h"
 #include "SAttributeComponent.h"
 #include "SWorldUserWidget.h"
 #include "GameFramework/Character.h"
@@ -23,6 +24,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere,Category="Components")
 	UPawnSensingComponent* PawnSensingComp;
+	
+	UPROPERTY(VisibleAnywhere,Category="Actions")
+	USActionComponent* ActionComp;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Attribute")
 	USAttributeComponent* AttributeComp;

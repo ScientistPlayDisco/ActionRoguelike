@@ -14,7 +14,7 @@ class ACTIONROGUELIKE_API USAction_ProjectileAttack : public USAction
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	UPROPERTY(EditAnywhere, Category = "Effects")
 	FName HandSocketName;
 	
 	UPROPERTY(EditAnywhere,Category="Attack")

@@ -15,6 +15,8 @@ USAttributeComponent::USAttributeComponent()
 	// off to improve performance if you don't need them.
 	HealthMax = 100;
 	Health = HealthMax;
+	RageMax= 100;
+	Rage = 0;
 	// ...
 }
 
@@ -52,7 +54,25 @@ bool USAttributeComponent::ApplyHealthChange(AActor* InstigateActor, float Delta
 
 	return ActualDelta !=0;
 }
- 
+
+bool USAttributeComponent::IsFullRage() const
+{
+	return RageMax == Rage;
+}
+
+bool USAttributeComponent::ApplyRageChange(AActor* InstigateActor, float Delta)
+{
+	if(IsFullRage())
+	{
+		return false;
+	}
+	float OldRage = Rage;
+	Rage = FMath::Clamp(Rage +Delta,0.f,RageMax);
+	float ActualDelta = Rage-OldRage;
+	OnRageChanged.Broadcast(InstigateActor,this,Rage,ActualDelta);
+
+	return true;
+}
 
 
 USAttributeComponent* USAttributeComponent::GetAttributes(AActor* FromActor)
@@ -101,15 +121,6 @@ bool USAttributeComponent::IsLowHealth()
 }
 
 
-
-
-// USAttributeComponent*  USAttributeComponent::GetAttributes(APawn* Pawn)  
-// {
-// 	USAttributeComponent* attr =  Cast<USAttributeComponent>(Pawn->GetComponentByClass(USAttributeComponent::StaticClass()));
-// 	if(attr)
-// 		return attr;
-// 	return nullptr;
-// }
 
 
 

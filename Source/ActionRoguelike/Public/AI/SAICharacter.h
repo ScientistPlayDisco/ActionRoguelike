@@ -34,7 +34,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly,Category="UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 
-	USWorldUserWidget* ActiveHealtheBar;
+	USWorldUserWidget* ActiveHealthBar;
+
+	UPROPERTY(EditDefaultsOnly,Category="UI")
+	TSubclassOf<UUserWidget> SpottedWidgetClass;
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
@@ -43,6 +46,11 @@ protected:
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
 	virtual void PostInitializeComponents() override;
 
+	UFUNCTION()
 	void SetTarget(AActor* NewTarget);
+
+	UFUNCTION()
+	AActor* GetTargetActor() const;
+
 };
 

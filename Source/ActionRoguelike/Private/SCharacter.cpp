@@ -60,6 +60,9 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 	if(Delta<0.f)
 	{
 		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName,GetWorld()->TimeSeconds);
+
+		//
+		OwningComp->ApplyRageChange(InstigatorActor,-Delta/5);
 	}
 	if(NewHealth<=0.f&&Delta<0.f)
 	{

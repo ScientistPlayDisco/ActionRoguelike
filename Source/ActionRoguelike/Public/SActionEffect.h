@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SAction.h"
+#include "SAttributeComponent.h"
 #include "SActionEffect.generated.h"
 
 /**

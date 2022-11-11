@@ -32,19 +32,27 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 	if (Delta<0.f)
 	{
 
+		//被攻击时候，设置instigator为新的target
 		if(InstigatorActor!=this)
 		{
 			SetTarget(InstigatorActor);
 		}
-		//spawn health bar
-		if(ActiveHealtheBar ==nullptr)
+		//如果instigator是 character的话，
+		USAttributeComponent* Comp = USAttributeComponent::GetAttributes(InstigatorActor);
+		if(Comp)
 		{
-			ActiveHealtheBar = CreateWidget<USWorldUserWidget>(GetWorld(),HealthBarWidgetClass);
-			if(ActiveHealtheBar)
+			Comp->ApplyRageChange(this,-Delta/5);
+		}
+		
+		//spawn health bar
+		if(ActiveHealthBar ==nullptr)
+		{
+			ActiveHealthBar = CreateWidget<USWorldUserWidget>(GetWorld(),HealthBarWidgetClass);
+			if(ActiveHealthBar)
 			{
 
-				ActiveHealtheBar->AttachedActor = this;
-				ActiveHealtheBar->AddToViewport();
+				ActiveHealthBar->AttachedActor = this;
+				ActiveHealthBar->AddToViewport();
 			}
 		}
 
@@ -95,9 +103,31 @@ void ASAICharacter::SetTarget(AActor* NewTarget)
 	
 }
 
+AActor* ASAICharacter::GetTargetActor() const
+{
+	AAIController* AIC = Cast<AAIController>(GetController());
+	if(AIC)
+	{
+		return Cast<AActor>(AIC->GetBlackboardComponent()->GetValueAsObject("TargetACtor"));
+		 
+	}
+	return nullptr;
+}
+
 void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
-	SetTarget(Pawn);
-	DrawDebugString(GetWorld(),GetActorLocation(),"PLAYER SPOTTED",nullptr,FColor::White,4.f,true);
+	if(GetTargetActor() != Pawn)
+	{
+		SetTarget(Pawn);
+
+		USWorldUserWidget* NewWidget = CreateWidget<USWorldUserWidget>(GetWorld(),SpottedWidgetClass);
+		if(NewWidget)
+		{
+			NewWidget->AttachedActor =this;
+			NewWidget->AddToViewport(10);
+			// DrawDebugString(GetWorld(),GetActorLocation(),"!",nullptr,FColor::Red,4.f,true);
+		}
+		// DrawDebugString(GetWorld(),GetActorLocation(),"PLAYER SPOTTED",nullptr,FColor::White,4.f,true);
+	}
 }
 

@@ -27,7 +27,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable,Category="Actions")
 	bool StopActionByName(AActor* Instigator,FName ActionName);
+
+	UFUNCTION(BlueprintCallable,Category="Actions")
 	void RemoveAction(USAction* Action);
+	
+	UFUNCTION(BlueprintCallable,Category="Actions")
+	USAction* GetAction(TSubclassOf<USAction> ActionClass) const;
 
 
 	// Sets default values for this component's properties

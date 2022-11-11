@@ -3,6 +3,7 @@
 
 #include "SActionEffect.h"
 
+#include "SAttributeComponent.h"
 
 
 USActionEffect::USActionEffect()
@@ -10,11 +11,10 @@ USActionEffect::USActionEffect()
 	bAutoStart =true;
 }
 
-
 void USActionEffect::StartAction_Implementation(AActor* Instigator)
 {
 	Super::StartAction_Implementation(Instigator);
-
+	
 	if (Duration > 0.f)
 	{
 		FTimerDelegate Delegate;
@@ -38,7 +38,6 @@ void USActionEffect::StopAction_Implementation(AActor* Instigator)
 	{
 		ExecutePeriodicEffect(Instigator);
 	}
-
 	Super::StopAction_Implementation(Instigator);
 	GetWorld()->GetTimerManager().ClearTimer(PeriodHandle);
 	GetWorld()->GetTimerManager().ClearTimer(DurationHandle);

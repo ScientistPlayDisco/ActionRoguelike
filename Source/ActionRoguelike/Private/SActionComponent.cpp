@@ -99,3 +99,16 @@ void USActionComponent::RemoveAction(USAction* Action)
 	Actions.Remove(Action);
 }
 
+USAction* USActionComponent::GetAction(TSubclassOf<USAction> ActionClass) const
+{
+	for (USAction* Action: Actions)
+	{
+		if(Action && Action->IsA(ActionClass) )
+		{
+			return Action;
+		}
+	}
+
+	return  nullptr;
+}
+

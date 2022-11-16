@@ -13,12 +13,12 @@ ASPowerup_Credits::ASPowerup_Credits()
 
 void ASPowerup_Credits::Interact_Implementation(APawn* InstigatorPawn)
 {
-	if(ensure(InstigatorPawn))
+	if(!ensure(InstigatorPawn))
 	{
 		return;
 	}
-
-	if(ASPlayerState* PS = InstigatorPawn->GetPlayerState<ASPlayerState>())
+	ASPlayerState* PS = InstigatorPawn->GetPlayerState<ASPlayerState>();
+	if(PS)
 	{
 		PS->AddCredits(CreditsAmount);
 		HideAndCooldownPowerup();

@@ -24,6 +24,16 @@ void ASGameModeBase::StartPlay()
 	Super::StartPlay();
 
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots,this,&ASGameModeBase::SpawnBotTimerElapsed,SpawnTimerInterval,true);
+
+	//Make sure we have assigned at least one power-up class
+	if(ensure(PowerupClasses.Num()>0))
+	{
+		UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this,PowerupSpawnQuery,this,EEnvQueryRunMode::AllMatching,nullptr);
+		if (ensure(QueryInstance))
+		{
+			QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this,&ASGameModeBase::OnPowerupSpawnQueryCompleted);
+		}
+	}
 }
 
 void ASGameModeBase::KillAll()
@@ -97,6 +107,57 @@ void ASGameModeBase::SpawnBotTimerElapsed()
 	UEnvQueryInstanceBlueprintWrapper* QuerryInstance =   UEnvQueryManager::RunEQSQuery(this,SpawnBotQuerry,this,EEnvQueryRunMode::RandomBest5Pct,nullptr);
 
 	QuerryInstance->GetOnQueryFinishedEvent().AddDynamic(this,&ASGameModeBase::OnQuerryCompleted);
+}
+
+void ASGameModeBase::OnPowerupSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
+	EEnvQueryStatus::Type QueryStatus)
+{
+	if (QueryStatus != EEnvQueryStatus::Success)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("Spawn Powerup is Failed!"));
+		return;
+	}
+
+	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
+
+	TArray<FVector> UsedLocations;
+
+	int32 SpawnCounter = 0;
+
+	while (SpawnCounter < DesiredPowerupCount && Locations.Num()>0)
+	{
+		int32 RandomLocationIndex = FMath::RandRange(0,Locations.Num()-1);
+
+		FVector PickedLocation =Locations[RandomLocationIndex];
+
+		Locations.RemoveAt(RandomLocationIndex);
+		bool bValidLocation =true;
+		for (FVector OtherLocation : UsedLocations)
+		{
+			float DistanceTo = (PickedLocation - OtherLocation).Size();
+
+			if (DistanceTo <RequirePowerupDistance)
+			{
+
+				bValidLocation = true;
+				break;
+			}
+		}
+
+		if (!bValidLocation)
+		{
+			continue;
+		}
+		int32 RandomClassIndex = FMath::RandRange(0,PowerupClasses.Num() -1);
+		TSubclassOf<AActor> RandomPowerupClass = PowerupClasses[RandomClassIndex];
+
+		PickedLocation.Z += 30.f;
+		GetWorld()->SpawnActor<AActor>(RandomPowerupClass,PickedLocation,FRotator::ZeroRotator);
+
+		UsedLocations.Add(PickedLocation);
+		SpawnCounter++;
+	}
+
 }
 
 void ASGameModeBase::RespawnPlayerElapsed(AController* Controller)

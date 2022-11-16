@@ -33,6 +33,10 @@ ASProjectileBase::ASProjectileBase()
 
 	ImpactShakeInnerRadius = 250.f;
 	ImpactShakeOuterRadius = 2500.f;
+
+	
+	// SetReplicates(true);
+	bReplicates  = true;
 }
 
 void ASProjectileBase::Explode_Implementation()

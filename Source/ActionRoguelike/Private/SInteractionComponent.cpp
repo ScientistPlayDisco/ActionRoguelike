@@ -38,7 +38,11 @@ void USInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FindBestInteractable();
+	APawn* MyPawn  = Cast<APawn>(GetOwner());
+	if (MyPawn->IsLocallyControlled())
+	{
+		FindBestInteractable();
+	}
 	// ...
 }
 
@@ -115,13 +119,20 @@ void USInteractionComponent::FindBestInteractable()
 
 void USInteractionComponent::PrimaryInteract()
 {
-	if (FocuseActor == nullptr)
+	ServerInteract(FocuseActor);
+}
+
+
+
+void USInteractionComponent::ServerInteract_Implementation(AActor* InFocus)
+{
+	if (InFocus == nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1,1.f,FColor::Red,"No FocuseActor to interact.");
 		return;
 	}
 	APawn* MyPawn = Cast<APawn>(GetOwner());
-	ISGameplayInterface::Execute_Interact(FocuseActor,MyPawn);
+	ISGameplayInterface::Execute_Interact(InFocus,MyPawn);
 }
 
-
+  

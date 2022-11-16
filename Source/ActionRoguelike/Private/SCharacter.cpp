@@ -53,25 +53,6 @@ void ASCharacter::MoveForward(float value)
 	// AddMovementInput(GetActorForwardVector(),value);
 }
 
-void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth,
-	float Delta)
-{
-
-	if(Delta<0.f)
-	{
-		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName,GetWorld()->TimeSeconds);
-
-		//
-		OwningComp->ApplyRageChange(InstigatorActor,-Delta/5);
-	}
-	if(NewHealth<=0.f&&Delta<0.f)
-	{
-		APlayerController* PC =Cast<APlayerController>(GetController());
-		DisableInput(PC);
-	}
-
-}
-
 // Called every frame
 void ASCharacter::Tick(float DeltaTime)
 {
@@ -151,5 +132,27 @@ FVector ASCharacter::GetPawnViewLocation() const
 void ASCharacter::HealSelf(float Amount)
 {
 	AttributeComp->ApplyHealthChange(this,Amount);
+}
+
+
+void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth,
+	float Delta)
+{
+
+	if(Delta<0.f)
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName,GetWorld()->TimeSeconds);
+
+		//
+		OwningComp->ApplyRageChange(InstigatorActor,-Delta/5);
+	}
+	if(NewHealth<=0.f&&Delta<0.f)
+	{
+		APlayerController* PC =Cast<APlayerController>(GetController());
+		DisableInput(PC);
+
+		SetLifeSpan(5.f);
+	}
+	
 }
 

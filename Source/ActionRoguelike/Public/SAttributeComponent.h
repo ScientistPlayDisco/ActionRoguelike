@@ -26,17 +26,26 @@ public:
 	static bool IsActorAlive(AActor* Actor);
 protected:
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Attributes")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Replicated,Category="Attributes")
 	float Health;
 
-	UPROPERTY(BlueprintReadOnly,Category="Attributes")
+	UPROPERTY(BlueprintReadOnly,Replicated,Category="Attributes")
 	float HealthMax;
 	
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Attributes")
+	UPROPERTY(EditDefaultsOnly,Replicated,BlueprintReadOnly,Category="Attributes")
 	float Rage;
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Attributes")
+	UPROPERTY(EditDefaultsOnly,Replicated,BlueprintReadOnly,Category="Attributes")
 	float RageMax;
+	
+	// UPROPERTY(ReplicatedUsing="")
+	// bool bIsAlive;
+	
+	UFUNCTION(NetMulticast,Reliable)//mark as unreliable once we removed the 'state' our of scharacter
+	void MulticastHealthChanged(AActor* InstigatorActor,float NewHealth,float Delta);
+
+	UFUNCTION(NetMulticast,Unreliable)//mark as unreliable once we removed the 'state' our of scharacter
+	void MulticastRageChanged(AActor* InstigatorActor,float NewRage,float Delta);
 public:
 	UFUNCTION()
 	bool Kill(AActor* InstigatorActor);

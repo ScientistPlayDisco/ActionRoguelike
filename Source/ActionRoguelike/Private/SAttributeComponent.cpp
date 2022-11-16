@@ -2,9 +2,8 @@
 
 
 #include "SAttributeComponent.h"
-
 #include "SGameModeBase.h"
-
+#include "Net/UnrealNetwork.h"
 static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("su.DamageMultiplier"),1.f,TEXT("Global Damage Modifier fir Attribute Component."),ECVF_Cheat);
 
 
@@ -17,6 +16,8 @@ USAttributeComponent::USAttributeComponent()
 	Health = HealthMax;
 	RageMax= 100;
 	Rage = 0;
+
+	SetIsReplicatedByDefault(true);
 	// ...
 }
 
@@ -27,7 +28,8 @@ bool USAttributeComponent::ApplyHealthChange(AActor* InstigateActor, float Delta
 	{
 		return  false;
 	}
-		
+
+
 	if(Delta<0.f)
 	{
 		float DamageMutiplier =	CVarDamageMultiplier.GetValueOnGameThread();  
@@ -36,13 +38,21 @@ bool USAttributeComponent::ApplyHealthChange(AActor* InstigateActor, float Delta
 	}
 	
 	float OldHealth = Health;
+	float NewHealth = FMath::Clamp(Health +Delta,0.f,HealthMax);
+	float ActualDelta = NewHealth - OldHealth;
 
-	Health = FMath::Clamp(Health +Delta,0.f,HealthMax);
+	//is server?
+	if (!GetOwner()->HasAuthority())
+	{
+		Health = NewHealth;
+		//OnHealthChanged.Broadcast(InstigateActor,this,Health,ActualDelta);
+		if (ActualDelta !=0.f)
+		{
+			MulticastHealthChanged(InstigateActor,Health,ActualDelta);
+		}
+	}
 
-	float ActualDelta = Health - OldHealth;
-
-	OnHealthChanged.Broadcast(InstigateActor,this,Health,ActualDelta);
-
+	//die 
 	if(ActualDelta<0.f&& Health ==0.f)
 	{
 		ASGameModeBase* GM = Cast<ASGameModeBase>(GetWorld()->GetAuthGameMode<ASGameModeBase>());
@@ -95,6 +105,17 @@ bool USAttributeComponent::IsActorAlive(AActor* Actor)
 	
 }
 
+void USAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor,
+	float NewHealth, float Delta)
+{
+	OnHealthChanged.Broadcast(InstigatorActor,this,NewHealth,Delta);
+}
+
+void USAttributeComponent::MulticastRageChanged_Implementation(AActor* InstigatorActor, float NewRage, float Delta)
+{
+	OnRageChanged.Broadcast(InstigatorActor,this,NewRage,Delta);
+}
+
 bool USAttributeComponent::Kill(AActor* InstigatorActor)
 {
 	return	ApplyHealthChange(InstigatorActor,-GetHealthMax());
@@ -120,7 +141,16 @@ bool USAttributeComponent::IsLowHealth()
 	return 30.f>=Health;
 }
 
+void USAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(USAttributeComponent,Health);
+	DOREPLIFETIME(USAttributeComponent,Rage);
+	
+	DOREPLIFETIME_CONDITION(USAttributeComponent,HealthMax,COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(USAttributeComponent,RageMax,COND_InitialOnly);
+}
 
 
 

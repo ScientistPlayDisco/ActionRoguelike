@@ -20,6 +20,10 @@ public:
 	USInteractionComponent();
 
 protected:
+	//reliable - Will always arrive, eventually. Request will be re-sent unless an acknowledgement was received.
+	//unreliable - Not guaranteed,packet can get lost and won't retry.
+	UFUNCTION(Server,Reliable)
+	void ServerInteract(AActor* InFocus);
 	
 	void FindBestInteractable();
 	// Called when the game starts

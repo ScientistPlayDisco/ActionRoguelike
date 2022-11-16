@@ -35,14 +35,21 @@ public:
 	USAction* GetAction(TSubclassOf<USAction> ActionClass) const;
 
 
+
 	// Sets default values for this component's properties
 	USActionComponent();
 protected:
 
+	UFUNCTION(Server,Reliable)
+	void ServerStartAction(AActor* Instigater,FName ActionName);
+
+	UFUNCTION(Server,Reliable)
+	void ServerStopAction(AActor* Instigater,FName ActionName);
+	
 	UPROPERTY(EditAnywhere,Category="Actions")
 	TArray<TSubclassOf<USAction>> DefaultActions;
 	
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	TArray<USAction*> Actions;
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -51,5 +58,5 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 };

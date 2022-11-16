@@ -24,7 +24,11 @@ protected:
 
 	UPROPERTY(EditAnywhere,Category="PowerUp")
 	float RespawnTime;
+	UPROPERTY(ReplicatedUsing="OnRep_IsActive",BlueprintReadOnly)
+	bool IsActive;
 
+	UFUNCTION()
+	void OnRep_IsActive();
 	UFUNCTION()
 	void ShowPowerup();
 	void Interact_Implementation(APawn* InstigatorPawn);
@@ -36,8 +40,13 @@ protected:
 	UPROPERTY(VisibleAnywhere,Category="Components")
 	USphereComponent* SphereComp;
 
+	UPROPERTY(VisibleAnywhere,Category="Components")
+	UStaticMeshComponent* MeshComp;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-};
+	//
+	// UFUNCTION(Server,Reliable)
+	// void ServerHideAndCooldownPowerup();
+ };

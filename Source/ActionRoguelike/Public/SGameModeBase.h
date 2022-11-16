@@ -29,6 +29,17 @@ protected:
 
 	UPROPERTY(EditAnywhere,Category ="AI")
 	UCurveFloat* DifficultyCurve;
+
+	UPROPERTY(EditAnywhere,Category ="AI")
+	UEnvQuery* PowerupSpawnQuery;
+
+	UPROPERTY(EditAnywhere,Category ="AI")
+	TArray<TSubclassOf<AActor>> PowerupClasses;
+
+	UPROPERTY(EditAnywhere,Category ="AI")
+	int32 DesiredPowerupCount;
+	UPROPERTY(EditAnywhere,Category ="AI")
+	float RequirePowerupDistance;
 	
 	UFUNCTION()
 	void OnQuerryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
@@ -36,12 +47,16 @@ protected:
 	void SpawnBotTimerElapsed();
 
 	UFUNCTION()
+	void OnPowerupSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+
+	
+	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);
 public:
 	ASGameModeBase();
-
+	UFUNCTION()
 	virtual void OnActorKilled(AActor* VictimActor,AActor* Killer);
-	
+
 	virtual void StartPlay() override;
 	UFUNCTION(Exec)
 	void KillAll();

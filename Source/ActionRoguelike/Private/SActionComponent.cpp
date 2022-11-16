@@ -4,11 +4,15 @@
 #include "SActionComponent.h"
 
 #include "SAction.h"
+#include "ActionRoguelike/ActionRoguelike.h"
+#include "Engine/ActorChannel.h"
+#include "Net/UnrealNetwork.h"
 // Sets default values for this component's properties
 USActionComponent::USActionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
+	SetIsReplicatedByDefault(true);
 }
 
 
@@ -17,11 +21,26 @@ void USActionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (TSubclassOf<USAction> ActionClass:DefaultActions)
+	if (GetOwner()->HasAuthority())
 	{
-		AddAction(GetOwner(),ActionClass);
+		for (TSubclassOf<USAction> ActionClass:DefaultActions)
+		{
+			AddAction(GetOwner(),ActionClass);
+		}
 	}
+
 	
+	for (USAction* Action:Actions)
+	{
+		FColor TextColor = Action->IsRunning() ?FColor::Blue :FColor::White;
+		FString ActionMsg = FString::Printf(TEXT("[%s] Action： %s : IsRuning %s: Outer:%s"),
+			*GetNameSafe(GetOwner()),
+			*Action->ActionName.ToString(),
+			Action->IsRunning() ? TEXT("true") : TEXT("false"),
+			*GetNameSafe(Action->GetOuter()));
+
+		LogOnScreen(this,ActionMsg,TextColor,0.f);
+	}
 }
 
 
@@ -29,11 +48,12 @@ void USActionComponent::BeginPlay()
 void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	//
+	// FString DebugMsg = GetNameSafe(GetOwner())+" : "+ActiveGameplayTags.ToStringSimple();
+	// GEngine->AddOnScreenDebugMessage(-1,0.f,FColor::White,DebugMsg);
 
-	FString DebugMsg = GetNameSafe(GetOwner())+" : "+ActiveGameplayTags.ToStringSimple();
-	GEngine->AddOnScreenDebugMessage(-1,0.f,FColor::White,DebugMsg);
+	
 }
-
 
 
 bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
@@ -48,6 +68,13 @@ bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 				GEngine->AddOnScreenDebugMessage(-1,2.f,FColor::Red,FailedMsg);
 				continue;
 			}
+
+			//Is Client?
+			if (!GetOwner()->HasAuthority())
+			{
+				ServerStartAction(Instigator,ActionName); 
+			}
+			
 			Action->StartAction(Instigator);
 			return true;
 		}
@@ -64,6 +91,10 @@ bool USActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 		{
 			if(Action->IsRunning())
 			{
+				if (!GetOwner()->HasAuthority())
+				{
+					ServerStopAction(Instigator,ActionName);
+				}
 				Action->StopAction(Instigator);
 				return true;
 			}
@@ -80,9 +111,16 @@ void USActionComponent::AddAction(AActor* Instigator,TSubclassOf<USAction> Actio
 		return;
 	}
 
-	USAction* NewAction =  NewObject<USAction>(this,ActionClass);
+	//Skip for clients
+	if (!GetOwner()->HasAuthority())
+	{
+		UE_LOG(LogTemp,Warning,TEXT("Client attemping to AddAction. [Class: %s]"),*GetNameSafe(ActionClass));
+		return;
+	}
+	USAction* NewAction =  NewObject<USAction>(GetOuter(),ActionClass);
 	if(ensure(NewAction))
 	{
+		NewAction->Initialize(this);
 		Actions.Add(NewAction);
 
 		if (NewAction->bAutoStart && ensure(NewAction->CanStart(Instigator)))
@@ -111,4 +149,37 @@ USAction* USActionComponent::GetAction(TSubclassOf<USAction> ActionClass) const
 
 	return  nullptr;
 }
+
+void USActionComponent::ServerStartAction_Implementation(AActor* Instigater, FName ActionName)
+{
+	StartActionByName(Instigater,ActionName);
+}
+
+bool USActionComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
+{
+	bool WroteSomething = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
+
+	for (USAction* Action:Actions)
+	{
+		if (Action)
+		{
+			WroteSomething |= Channel->ReplicateSubobject(Action,*Bunch,*RepFlags);
+		}
+	}
+	return WroteSomething;
+}
+
+void USActionComponent::ServerStopAction_Implementation(AActor* Instigater, FName ActionName)
+{
+	StopActionByName(Instigater,ActionName);
+}
+
+
+void USActionComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(USActionComponent,Actions);
+}
+
+
 

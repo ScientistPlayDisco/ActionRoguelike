@@ -3,6 +3,15 @@
 
 #include "SAction.h"
 
+#include "ActionRoguelike/ActionRoguelike.h"
+#include "Net/UnrealNetwork.h"
+
+
+void USAction::Initialize(USActionComponent* NewActionComp)
+{
+	ActionComp = NewActionComp;
+}
+
 bool USAction::CanStart_Implementation(AActor* Instigator)
 {
 	if(IsRunning())
@@ -20,42 +29,68 @@ bool USAction::CanStart_Implementation(AActor* Instigator)
 
 void USAction::StartAction_Implementation(AActor* Instigator)
 {
-	UE_LOG(LogTemp,Log,TEXT("Runing %s"),*GetNameSafe(this));
-
+	LogOnScreen(this,FString::Printf(TEXT("Started: %s"),*ActionName.ToString()),FColor::Green);
 	USActionComponent* Comp = GetOwningComponent();
 	Comp->ActiveGameplayTags.AppendTags(GrantsTags);
-	bIsRunning = true;
+	RepData.IsRunning = true;
+	RepData.Instigator = Instigator;
 }
 
 void USAction::StopAction_Implementation(AActor* Instigator)
 {
-	UE_LOG(LogTemp,Log,TEXT("Runing %s"),*GetNameSafe(this));
+	LogOnScreen(this,FString::Printf(TEXT("Stoped: %s"),*ActionName.ToString()),FColor::White);
 
-	ensureAlways(bIsRunning);
+	//ensureAlways(bIsRunning);
 
 	USActionComponent* Comp = GetOwningComponent();
 	Comp->ActiveGameplayTags.RemoveTags(GrantsTags);
-	bIsRunning = false;
+	RepData.IsRunning = false;
+	RepData.Instigator = Instigator;
+
 }
 
 UWorld* USAction::GetWorld() const
 {
 	//the outer is set when creating action via NewObject<T>
-	UActorComponent* Comp = Cast<UActorComponent>(GetOuter());
-	if (Comp)
+	AActor* Actor = Cast<AActor>(GetOuter());
+	if (Actor)
 	{
-		return Comp->GetWorld();
+		return Actor->GetWorld();
 	}
 	return nullptr;
 }
 
 USActionComponent* USAction::GetOwningComponent() const
 {
-	return Cast<USActionComponent>(GetOuter());
+	// AActor* Actor = Cast<AActor>(GetOuter());
+	// return Actor->GetComponentByClass(USActionComponent::StaticClass());
+	// return Cast<USActionComponent>(GetOuter());
+	return  ActionComp;
 }
+
+void USAction::OnRep_RepData()
+{
+	if (RepData.IsRunning) 
+	{
+		StartAction(RepData.Instigator);
+	}
+	else
+	{
+		StopAction(RepData.Instigator);
+	}
+}
+
 
 bool USAction::IsRunning_Implementation() const
 {
-	return bIsRunning;
+	return RepData.IsRunning;
 }
 
+void USAction::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(USAction,RepData);
+	DOREPLIFETIME(USAction,ActionComp);
+
+}

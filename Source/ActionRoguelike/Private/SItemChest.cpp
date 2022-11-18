@@ -30,12 +30,7 @@ void ASItemChest::Interact_Implementation(APawn* InstigatorPawn)
 	OnRep_LidOpened();
 }
 
-void ASItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ASItemChest,bLidOpened);	
-}
 
 void ASItemChest::OnRep_LidOpened()
 {
@@ -43,4 +38,15 @@ void ASItemChest::OnRep_LidOpened()
 	LidMesh->SetRelativeRotation(FRotator(CurrPitch,0,0));
 }
 
+void ASItemChest::OnActorLoaded_Implementation()
+{
+	// ISGameplayInterface::OnActorLoaded_Implementation();
+	OnRep_LidOpened();
+}
 
+void ASItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASItemChest,bLidOpened);	
+}

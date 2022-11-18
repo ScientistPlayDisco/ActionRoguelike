@@ -48,6 +48,24 @@ int32 ASPlayerState::GetCredits() const
 	return Credits;
 }
 
+void ASPlayerState::LoadPlayerState_Implementation(USSaveGame* SaveObject)
+{
+	if (SaveObject)
+	{
+		AddCredits(SaveObject->Credits);
+		// Credits = SaveObject->Credits ;
+	}
+}
+
+void ASPlayerState::SavePlayerState_Implementation(USSaveGame* SaveObject)
+{
+	if (SaveObject)
+	{
+		SaveObject->Credits = Credits;	
+	}
+}
+
+
 void ASPlayerState::GetLifetimeReplicatedProps( TArray< class FLifetimeProperty > & OutLifetimeProps ) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

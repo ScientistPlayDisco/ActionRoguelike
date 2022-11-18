@@ -10,6 +10,17 @@
 
 #include "Particles/ParticleSystemComponent.h"
 
+// Sets default values
+ASMagicProjectile::ASMagicProjectile()
+{
+	SphereComp->SetSphereRadius(20.0f);
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ASMagicProjectile::OnActorOverlap);
+
+	DamageAmount = 30.f;
+
+	SetReplicates(true);
+}
+
 
 void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* PrimitiveComponent, AActor* Actor,
                                        UPrimitiveComponent* PrimitiveComponent1, int I, bool bArg, const FHitResult& HitResult)
@@ -36,15 +47,6 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* PrimitiveComponent, 
 	}
 }
 
-
-// Sets default values
-ASMagicProjectile::ASMagicProjectile()
-{
-	SphereComp->SetSphereRadius(20.0f);
-	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ASMagicProjectile::OnActorOverlap);
-
-	DamageAmount = 30.f;
-}
 
 
 // Called when the game starts or when spawned

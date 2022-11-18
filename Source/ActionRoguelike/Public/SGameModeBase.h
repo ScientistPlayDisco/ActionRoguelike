@@ -8,6 +8,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "SGameModeBase.generated.h"
 
+class USSaveGame;
 /**
  * 
  */
@@ -16,6 +17,11 @@ class ACTIONROGUELIKE_API ASGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 protected:
+
+	FString SlotName;
+	
+	UPROPERTY()
+	USSaveGame* CurrentSaveGame;
 	FTimerHandle TimerHandle_SpawnBots;
 
 	UPROPERTY(EditAnywhere,Category ="AI")
@@ -57,7 +63,15 @@ public:
 	UFUNCTION()
 	virtual void OnActorKilled(AActor* VictimActor,AActor* Killer);
 
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	virtual void StartPlay() override;
+
+	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 	UFUNCTION(Exec)
 	void KillAll();
+
+	UFUNCTION(BlueprintCallable,Category="SaveGame")
+	void WriteSaveGame();
+
+	void LoadSaveGame();
 };

@@ -52,7 +52,7 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 			{
 
 				ActiveHealthBar->AttachedActor = this;
-				ActiveHealthBar->AddToViewport();
+				ActiveHealthBar->AddToViewport(10);
 			}
 		}
 
@@ -114,20 +114,24 @@ AActor* ASAICharacter::GetTargetActor() const
 	return nullptr;
 }
 
+
 void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
 	if(GetTargetActor() != Pawn)
 	{
 		SetTarget(Pawn);
 
-		USWorldUserWidget* NewWidget = CreateWidget<USWorldUserWidget>(GetWorld(),SpottedWidgetClass);
-		if(NewWidget)
-		{
-			NewWidget->AttachedActor =this;
-			NewWidget->AddToViewport(10);
-			// DrawDebugString(GetWorld(),GetActorLocation(),"!",nullptr,FColor::Red,4.f,true);
-		}
-		// DrawDebugString(GetWorld(),GetActorLocation(),"PLAYER SPOTTED",nullptr,FColor::White,4.f,true);
+		
+		MulticastPawnSeen();
 	}
 }
 
+void ASAICharacter::MulticastPawnSeen_Implementation()
+{
+	USWorldUserWidget* NewWidget = CreateWidget<USWorldUserWidget>(GetWorld(),SpottedWidgetClass);
+	if(NewWidget)
+	{
+		NewWidget->AttachedActor =this;
+		NewWidget->AddToViewport(10);
+	}
+}

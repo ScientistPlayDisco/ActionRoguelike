@@ -42,7 +42,7 @@ bool USAttributeComponent::ApplyHealthChange(AActor* InstigateActor, float Delta
 	float ActualDelta = NewHealth - OldHealth;
 
 	//is server?
-	if (!GetOwner()->HasAuthority())
+	if (GetOwner()->HasAuthority())
 	{
 		Health = NewHealth;
 		//OnHealthChanged.Broadcast(InstigateActor,this,Health,ActualDelta);
@@ -50,17 +50,19 @@ bool USAttributeComponent::ApplyHealthChange(AActor* InstigateActor, float Delta
 		{
 			MulticastHealthChanged(InstigateActor,Health,ActualDelta);
 		}
-	}
 
-	//die 
-	if(ActualDelta<0.f&& Health ==0.f)
-	{
-		ASGameModeBase* GM = Cast<ASGameModeBase>(GetWorld()->GetAuthGameMode<ASGameModeBase>());
-		if(GM)
+		//die 
+		if(ActualDelta<0.f&& Health ==0.f)
 		{
-			 GM->OnActorKilled(GetOwner(),InstigateActor);
+			ASGameModeBase* GM = Cast<ASGameModeBase>(GetWorld()->GetAuthGameMode<ASGameModeBase>());
+			if(GM)
+			{
+				GM->OnActorKilled(GetOwner(),InstigateActor);
+			}
 		}
 	}
+
+	
 
 	return ActualDelta !=0;
 }
@@ -147,9 +149,11 @@ void USAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 	DOREPLIFETIME(USAttributeComponent,Health);
 	DOREPLIFETIME(USAttributeComponent,Rage);
-	
-	DOREPLIFETIME_CONDITION(USAttributeComponent,HealthMax,COND_InitialOnly);
-	DOREPLIFETIME_CONDITION(USAttributeComponent,RageMax,COND_InitialOnly);
+	DOREPLIFETIME(USAttributeComponent,HealthMax);
+	DOREPLIFETIME(USAttributeComponent,RageMax);
+	//
+	// DOREPLIFETIME_CONDITION(USAttributeComponent,HealthMax,COND_InitialOnly);
+	// DOREPLIFETIME_CONDITION(USAttributeComponent,RageMax,COND_InitialOnly);
 }
 
 

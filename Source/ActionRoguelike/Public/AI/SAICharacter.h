@@ -22,23 +22,25 @@ public:
 protected:
 	// Called when the game starts or when spawned
 
-	UPROPERTY(VisibleAnywhere,Category="Components")
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
 	UPawnSensingComponent* PawnSensingComp;
 	
-	UPROPERTY(VisibleAnywhere,Category="Actions")
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Actions")
 	USActionComponent* ActionComp;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Attribute")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Attribute")
 	USAttributeComponent* AttributeComp;
 
-	UPROPERTY(EditDefaultsOnly,Category="UI")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 
 	USWorldUserWidget* ActiveHealthBar;
 
-	UPROPERTY(EditDefaultsOnly,Category="UI")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="UI")
 	TSubclassOf<UUserWidget> SpottedWidgetClass;
 
+	UFUNCTION(NetMulticast,Unreliable)
+	void MulticastPawnSeen();
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
 

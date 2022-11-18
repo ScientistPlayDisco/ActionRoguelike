@@ -28,7 +28,6 @@ void USActionComponent::BeginPlay()
 			AddAction(GetOwner(),ActionClass);
 		}
 	}
-
 	
 	for (USAction* Action:Actions)
 	{

@@ -18,11 +18,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	float TargetPitch;
 	
-	virtual  void Interact_Implementation(APawn* InstigatorPawn) override;
+	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 
+	virtual void OnActorLoaded_Implementation() override;
 protected:
 	
-	UPROPERTY(ReplicatedUsing="OnRep_LidOpened",BlueprintReadOnly)
+	UPROPERTY(ReplicatedUsing="OnRep_LidOpened",BlueprintReadOnly,SaveGame)
 	bool bLidOpened;
 
 	UFUNCTION()
@@ -33,4 +34,5 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	UStaticMeshComponent* LidMesh;
 
+	
 };

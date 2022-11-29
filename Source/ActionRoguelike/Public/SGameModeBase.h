@@ -3,12 +3,39 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "EnvironmentQuery/EnvQuery.h"
 #include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
 #include "GameFramework/GameModeBase.h"
 #include "SGameModeBase.generated.h"
 
 class USSaveGame;
+
+
+USTRUCT()
+struct FMonsterInfoRow: public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+	FMonsterInfoRow()
+	{
+		Weight =1.f;
+		SpawnCost = 5.f;
+		KillReward = 20.f;
+	}
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	TSubclassOf<AActor> MonsterClass;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	float Weight;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	float SpawnCost;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	float KillReward;
+};
 /**
  * 
  */
@@ -30,9 +57,10 @@ protected:
 	UPROPERTY(EditAnywhere,Category ="AI")
 	UEnvQuery* SpawnBotQuerry;
 
+	// UPROPERTY(EditAnywhere,Category ="AI")
+	// TSubclassOf<AActor> MinionClass;
 	UPROPERTY(EditAnywhere,Category ="AI")
-	TSubclassOf<AActor> MinionClass;
-
+	UDataTable* MonsterTable;
 	UPROPERTY(EditAnywhere,Category ="AI")
 	UCurveFloat* DifficultyCurve;
 

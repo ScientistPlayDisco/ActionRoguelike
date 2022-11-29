@@ -128,6 +128,10 @@ void ASAICharacter::OnPawnSeen(APawn* Pawn)
 
 void ASAICharacter::MulticastPawnSeen_Implementation()
 {
+	if (!ensure(SpottedWidgetClass))
+	{
+		return;
+	}
 	USWorldUserWidget* NewWidget = CreateWidget<USWorldUserWidget>(GetWorld(),SpottedWidgetClass);
 	if(NewWidget)
 	{

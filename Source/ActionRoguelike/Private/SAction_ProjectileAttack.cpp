@@ -75,7 +75,4 @@ void USAction_ProjectileAttack::StartAction_Implementation(AActor* Instigator)
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle_AttackDelay,Delegate,AttackAnimDelay,false);
 		}
 	}
-	
-
-
 }

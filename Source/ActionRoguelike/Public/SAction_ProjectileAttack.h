@@ -14,23 +14,23 @@ class ACTIONROGUELIKE_API USAction_ProjectileAttack : public USAction
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(EditAnywhere, Category = "Effects")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = "Effects")
 	FName HandSocketName;
 	
-	UPROPERTY(EditAnywhere,Category="Attack")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attack")
 	TSubclassOf<AActor> ProjectileClass;
 	
-	UPROPERTY(EditAnywhere,Category="Attack")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attack")
 	UAnimMontage* AttackAnim;
 
-	UPROPERTY(EditAnywhere,Category="Attack")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attack")
 	float AttackAnimDelay;
 
 	/* Particle System played during attack animation */
-	UPROPERTY(EditAnywhere, Category = "Attack")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Attack")
 	UParticleSystem* CastingEffect;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void AttackDelay_Elapsed(ACharacter* InstigatorCharacter);
 	
 public:

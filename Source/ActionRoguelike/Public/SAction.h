@@ -31,11 +31,19 @@ class ACTIONROGUELIKE_API USAction : public UObject
 	GENERATED_BODY()
 protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="UI")
-	UTexture2D* Icon;
-	
+	TSoftObjectPtr<UTexture2D> Icon;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="UI")
+	TSoftObjectPtr<UTexture2D> SkillIcon;
+
+	UPROPERTY(EditDefaultsOnly,Category="UI")
+	TSoftObjectPtr<UUserWidget> UIWidget;
+
 	UPROPERTY(Replicated)
 	USActionComponent* ActionComp;
 	
+	FTimerHandle TimerHandle_CoolDownTimer;
+
 	UFUNCTION(BlueprintCallable,Category="Actions")
 	USActionComponent* GetOwningComponent() const;
 
@@ -53,10 +61,21 @@ protected:
 	
 	UFUNCTION()
 	void OnRep_RepData();
-public:
 
+
+public:
+	UFUNCTION()
+	void CoolDown();
 	void Initialize(USActionComponent* NewActionComp);
-	
+	UFUNCTION(BlueprintCallable)
+	void SetCoolDown(float CoolDownTime);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void ImplementActAfterStartAction();
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Actions")
+	float CoolDownTime;
+	UPROPERTY(BlueprintReadOnly,Category="Actions")
+	bool bIsCoolDown;
 	UPROPERTY(EditDefaultsOnly,Category="Actions")
 	bool bAutoStart;
 	

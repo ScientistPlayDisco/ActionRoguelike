@@ -54,7 +54,6 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	
 }
 
-
 bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 {
 	for (USAction* Action: Actions)
@@ -73,8 +72,8 @@ bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 			{
 				ServerStartAction(Instigator,ActionName); 
 			}
-			
 			Action->StartAction(Instigator);
+			Action->SetCoolDown(Action->CoolDownTime);
 			return true;
 		}
 	}

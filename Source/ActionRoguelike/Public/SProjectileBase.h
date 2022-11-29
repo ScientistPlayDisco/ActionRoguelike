@@ -47,7 +47,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UAudioComponent* AudioComp;
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void OnActorHit(UPrimitiveComponent* HitComponent,AActor* OtherActor,UPrimitiveComponent* OtherComp,FVector NormalImpluse,const FHitResult& Hit);
 
 

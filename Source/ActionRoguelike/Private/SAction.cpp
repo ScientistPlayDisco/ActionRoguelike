@@ -10,11 +10,27 @@
 void USAction::Initialize(USActionComponent* NewActionComp)
 {
 	ActionComp = NewActionComp;
+	
+}
+
+void USAction::SetCoolDown(float Time)
+{
+	bIsCoolDown = true;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_CoolDownTimer,this,&USAction::CoolDown,Time);
+}
+
+void USAction::ImplementActAfterStartAction_Implementation()
+{
 }
 
 bool USAction::CanStart_Implementation(AActor* Instigator)
 {
+
 	if(IsRunning())
+	{
+		return false;
+	}
+	if (bIsCoolDown)
 	{
 		return false;
 	}
@@ -40,6 +56,8 @@ void USAction::StartAction_Implementation(AActor* Instigator)
 		TimeStarted =GetWorld()->TimeSeconds;
 	}
 	GetOwningComponent()->OnActionStarted.Broadcast(GetOwningComponent(),this);
+
+	ImplementActAfterStartAction();
 }
 
 void USAction::StopAction_Implementation(AActor* Instigator)
@@ -88,7 +106,10 @@ void USAction::OnRep_RepData()
 	}
 }
 
-
+void USAction::CoolDown()
+{
+	bIsCoolDown = false;
+}
 
 
 bool USAction::IsRunning_Implementation() const

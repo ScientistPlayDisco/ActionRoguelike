@@ -4,6 +4,7 @@
 #include "AI/SAICharacter.h"
 
 #include <string>
+#include <wrl/event.h>
 
 #include "AIController.h"
 #include "BrainComponent.h"
@@ -13,6 +14,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASAICharacter::ASAICharacter()
@@ -132,10 +134,17 @@ void ASAICharacter::MulticastPawnSeen_Implementation()
 	{
 		return;
 	}
-	USWorldUserWidget* NewWidget = CreateWidget<USWorldUserWidget>(GetWorld(),SpottedWidgetClass);
+	NewWidget = CreateWidget<USWorldUserWidget>(GetWorld(),SpottedWidgetClass);
 	if(NewWidget)
 	{
 		NewWidget->AttachedActor =this;
 		NewWidget->AddToViewport(10);
+		FTimerHandle FTimerHandle_Destroy;
+		GetWorld()->GetTimerManager().SetTimer(FTimerHandle_Destroy,[&]()
+		{
+			this->NewWidget->RemoveFromParent();
+			GetWorld()->GetTimerManager().ClearTimer(FTimerHandle_Destroy);
+
+		},3,false);
 	}
 }

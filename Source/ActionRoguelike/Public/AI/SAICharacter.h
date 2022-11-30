@@ -39,6 +39,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="UI")
 	TSubclassOf<UUserWidget> SpottedWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="UI")
+	USWorldUserWidget* NewWidget;
+
 	UFUNCTION(NetMulticast,Unreliable)
 	void MulticastPawnSeen();
 	UFUNCTION()

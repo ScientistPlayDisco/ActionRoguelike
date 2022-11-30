@@ -150,7 +150,7 @@ USAction* USActionComponent::GetAction(TSubclassOf<USAction> ActionClass) const
 
 void USActionComponent::ServerStartAction_Implementation(AActor* Instigater, FName ActionName)
 {
-	StartActionByName(Instigater,ActionName);
+	   StartActionByName(Instigater,ActionName);
 }
 
 bool USActionComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
